@@ -1,8 +1,6 @@
 import React from '../react'
 import {setAttribute} from './dom'
-/****
-vnode可以分为三种，分别为文本，原生dom，和组件（组件数组）
- ****/
+// vnode可以分为三种，分别为文本，原生dom，和组件（组件数组）
 export function diff(dom, vnode, container) {
 	const ret = diffNode(dom, vnode)
     if (container && ret.parentNode !== container) {
@@ -243,7 +241,7 @@ export function renderComponent(component) {
     }
     base = diffNode(component.base, renderer)
     component.base = base
-    base._component = component
+    base._component = component  // dom和component互相持有彼此的实例
 }
 
 

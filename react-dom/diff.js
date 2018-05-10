@@ -154,7 +154,7 @@ function diffChildren(dom, vchildren) {
 	        if (child && child !== dom && child !== f) {
 	        	if (!f) {
 	        		dom.appendChild(child)		
-	        	}else if (child === f.nextSibling) {
+	        	}else if (child === f.nextElementSibling) {
 	        		removeNode(f)
 	        	}else {
 					dom.insertBefore(child, f)
@@ -164,7 +164,7 @@ function diffChildren(dom, vchildren) {
 	}
 }
 // 对比组件
-function diffComponent(dom, vnode){
+function diffComponent(dom, vnode) {
 	let c = dom && dom._component
 	let oldDom = dom
 	// 如果组件类型没有变化，则重新set props
@@ -217,6 +217,21 @@ function setComponentProps(component, props) {
 			component.componentWillMount()
 		}
 	}
+	// 如果当前组件有dom挂载实例
+	if (component.base) {
+		// 尝试获取当前组件dom挂载实例的兄弟dom
+		const nextDom = component.base.nextElementSibling
+		// 比较当前组件的props和重新设置的props是否相同
+		const isSameProp = JSON.stringify(component.props) === JSON.stringify(props)
+		// 如果新旧props不同，且有兄弟dom
+		if (!isSameProp && nextDom) {
+			// 如果兄弟dom有实例组件，则更新当前组件的state为兄弟dom的实例组件的state
+			if (nextDom._component && nextDom._component.state) {
+				Object.assign(component.state, nextDom._component.state)
+			}
+		}
+	}
+	// 更新当前组件的props
 	component.props = props
 	renderComponent(component)
 }
